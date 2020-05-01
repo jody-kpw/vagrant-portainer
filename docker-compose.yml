@@ -3,16 +3,15 @@ version: '3'
 services:
   portainer:
     container_name: vagrant-portainer
-    hostname: portainer
-    restart: always
-    image: portainer/portainer
+    image: portainer/portainer:1.23.2
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
       - 9000:9000
-    environment:
-      TZ: "Asia/Hong_Kong"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - data:/data
+
 volumes:
   data:
-    driver: local
