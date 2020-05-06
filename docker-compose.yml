@@ -9,9 +9,28 @@ services:
       - no-new-privileges:true
     ports:
       - 9000:9000
+    networks:
+      - traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - data:/data
+    labels:
+      # Dynamic configuration with Docker Labels
+      # Ref: https://docs.traefik.io/reference/dynamic-configuration/docker/
+      - traefik.enable=true
+      - traefik.http.middlewares.portainer-redirect-web-secure.redirectscheme.scheme=https
+      - traefik.http.routers.portainer-web.middlewares=portainer-redirect-web-secure
+      - traefik.http.routers.portainer-web.rule=Host(`portainer.docker.local`)
+      - traefik.http.routers.portainer-web.entrypoints=web
+      - traefik.http.routers.portainer-web-secure.rule=Host(`portainer.docker.local`)
+      - traefik.http.routers.portainer-web-secure.tls=true
+      - traefik.http.routers.portainer-web-secure.entrypoints=web-secure
+      # if you have multiple ports exposed on the service, specify port in the web-secure service
+      - traefik.http.services.portainer-web-secure.loadbalancer.server.port=9000
 
 volumes:
   data:
+
+networks:
+  traefik:
+    external: true
